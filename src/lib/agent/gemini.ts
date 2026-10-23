@@ -2,7 +2,7 @@
  * Gemini client -- server-side only
  *
  * Model fallback chain (free tier, highest quota first):
- *   1. gemini-2.0-flash        -- 1,500 req/day, 15 RPM
+ *   1. gemini-2.5-flash        -- replaces deprecated gemini-2.0-flash
  *   2. gemini-1.5-flash        -- 1,500 req/day, 15 RPM
  *   3. gemini-1.5-flash-8b     -- 1,500 req/day, 15 RPM (smallest/fastest)
  */
@@ -11,7 +11,7 @@ import { GoogleGenerativeAI, type GenerativeModel } from "@google/generative-ai"
 
 // Ordered by preference -- first model that isn't rate-limited wins
 const MODEL_CHAIN = [
-  "gemini-2.0-flash",
+  "gemini-2.5-flash",
   "gemini-1.5-flash",
   "gemini-1.5-flash-8b",
 ] as const;
