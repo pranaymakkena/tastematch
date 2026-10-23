@@ -1,16 +1,20 @@
 ﻿/**
  * Gemini client -- server-side only
  *
- * Model fallback chain (free tier, highest quota first):
- *   1. gemini-2.5-flash        -- replaces deprecated gemini-2.0-flash
- *   2. gemini-1.5-flash        -- 1,500 req/day, 15 RPM
- *   3. gemini-1.5-flash-8b     -- 1,500 req/day, 15 RPM (smallest/fastest)
+ * Model fallback chain (newest → oldest):
+ *   1. gemini-3.8-flash        -- latest GA Flash model (Sep 2026)
+ *   2. gemini-3.5-flash        -- GA, near-Pro agentic capabilities
+ *   3. gemini-2.5-flash        -- previous generation fallback
+ *   4. gemini-1.5-flash        -- stable free-tier fallback
+ *   5. gemini-1.5-flash-8b     -- smallest/fastest last resort
  */
 
 import { GoogleGenerativeAI, type GenerativeModel } from "@google/generative-ai";
 
-// Ordered by preference -- first model that isn't rate-limited wins
+// Ordered by preference -- first model that works wins
 const MODEL_CHAIN = [
+  "gemini-3.8-flash",
+  "gemini-3.5-flash",
   "gemini-2.5-flash",
   "gemini-1.5-flash",
   "gemini-1.5-flash-8b",
@@ -28,7 +32,7 @@ function getGenAI(): GoogleGenerativeAI {
   return new GoogleGenerativeAI(key);
 }
 
-/** Returns true when the error is a 429 / quota error from the Gemini API. */
+/** Returns true when the error should cause a fallback to the next model. */
 function isQuotaError(err: unknown): boolean {
   if (!(err instanceof Error)) return false;
   const msg = err.message.toLowerCase();
@@ -36,7 +40,11 @@ function isQuotaError(err: unknown): boolean {
     msg.includes("429") ||
     msg.includes("resource_exhausted") ||
     msg.includes("quota") ||
-    msg.includes("rate limit")
+    msg.includes("rate limit") ||
+    // 404 means the model is deprecated/unavailable -- skip to the next one
+    msg.includes("404") ||
+    msg.includes("not found") ||
+    msg.includes("no longer available")
   );
 }
 
@@ -60,7 +68,7 @@ async function withFallback<T>(
       return await fn(model, name);
     } catch (err) {
       if (isQuotaError(err)) {
-        console.warn(`[gemini] ${name} quota exhausted -- trying next model`);
+        console.warn(`[gemini] ${name} unavailable (quota/deprecated) -- trying next model`);
         exhausted.add(name);
         lastErr = err;
       } else {
