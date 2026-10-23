@@ -10,11 +10,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "TasteMatch — Find the cultural overlap between two people",
+  title: "TasteMatch: Find the cultural overlap between two people",
   description:
-    "Tell us what you both love. Our cultural intelligence agent finds the unexpected things you might love together — powered by Qloo Taste AI™.",
+    "Tell us what you both love. Our cultural intelligence agent finds the unexpected things you might love together, powered by Qloo Taste AI.",
   openGraph: {
-    title: "TasteMatch — Cultural Compatibility Agent",
+    title: "TasteMatch: Cultural Compatibility Agent",
     description: "Find the cultural overlap between two people.",
     type: "website",
   },

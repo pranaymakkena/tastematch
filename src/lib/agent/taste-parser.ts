@@ -51,10 +51,13 @@ Return JSON in this exact shape:
 }
 
 Rules:
-- Extract every specific entity mentioned (movies, artists, places, brands, foods, etc.)
+- Extract every specific entity mentioned (movies, artists, places, brands, foods, drinks, etc.)
+- Be generous: "coffee" is a valid food entity, "Dune" is a valid film entity, "Odyssey" is a valid film entity
+- Common drinks like coffee, tea, matcha are valid food/hobby entities — include them
+- Short inputs are fine — extract whatever is there, even if it is just one or two things
 - Use the most specific category for each entity
 - Keep entity text close to the original wording but clean it up slightly
-- Return an empty entities array if nothing recognizable is found
+- Only return an empty entities array if the input is completely nonsensical or blank
 - Maximum 12 entities
 `;
 
